@@ -46,7 +46,7 @@ public enum AirplaneKind{
 
     public AirplaneKind getBaseKind() {
         if (parent == null) return this;
-        return parent.getAncestorKind();
+        return parent.getBaseKind();
     }
 
     /**
