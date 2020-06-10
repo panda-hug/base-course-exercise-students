@@ -1,2 +1,6 @@
 /build/
 /out/
+
+.idea/compiler.xml
+.idea/gradle.xml
+.idea/misc.xml
