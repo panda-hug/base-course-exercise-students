@@ -3,6 +3,7 @@ package iaf.ofek.hadracha.base_course.web_server.EjectedPilotRescue;
 import iaf.ofek.hadracha.base_course.web_server.AirSituation.AirSituationProvider;
 import iaf.ofek.hadracha.base_course.web_server.AirSituation.Airplane;
 import iaf.ofek.hadracha.base_course.web_server.AirSituation.AirplaneKind;
+
 import iaf.ofek.hadracha.base_course.web_server.Data.Coordinates;
 import iaf.ofek.hadracha.base_course.web_server.Data.InMemoryMapDataBase;
 import iaf.ofek.hadracha.base_course.web_server.Utilities.GeographicCalculations;
@@ -31,16 +32,22 @@ public class EjectedPilotHandler {
 
     @GetMapping("/infos")
     List<EjectedPilotInfo> getEjectedPilotInfos() {
-        @NotNull List<EjectedPilotInfo> pilotInfo = dataBase.getAllOfType(EjectedPilotInfo.class);
+        @NotNull List<EjectedPilotInfo> ejectedPilotInfos = dataBase.getAllOfType(EjectedPilotInfo.class);
         // More logic?
-        return pilotInfo;
+        return ejectedPilotInfos;
     }
 
     @GetMapping("/takeResponsibility")
     // TODO: Correct return type?
-    Object takeResponsibility(@CookieValue(name = "client-id") String clientId, @RequestParam int ejectionId) {
-        // all the logic
-        return null;
+    void takeResponsibility(@CookieValue(name = "client-id") String clientId, @RequestParam int ejectionId) {
+        EjectedPilotInfo ejectedInfo = dataBase.getByID(ejectionId, EjectedPilotInfo.class);
+        if(ejectedInfo.rescuedBy!=null){
+            ejectedInfo.rescuedBy = clientId;
+            Coordinates headTO = ejectedInfo.coordinates;
+            getClosestAvailableAirplanes(headTO)
+                    .forEach(airplane -> airplane.flyTo(headTO, clientId));
+        }
+
     }
 
     private List<Airplane> getClosestAvailableAirplanes(Coordinates crashLocation) {
