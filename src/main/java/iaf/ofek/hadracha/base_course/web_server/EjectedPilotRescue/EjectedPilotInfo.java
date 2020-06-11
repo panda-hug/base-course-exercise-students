@@ -4,12 +4,12 @@ import iaf.ofek.hadracha.base_course.web_server.AirSituation.Airplane;
 import iaf.ofek.hadracha.base_course.web_server.Data.Coordinates;
 import iaf.ofek.hadracha.base_course.web_server.Data.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EjectedPilotInfo implements Entity<EjectedPilotInfo> {
     private int id;
-    private List<AllocatedAirplane> allocatedAirplanes = new ArrayList<>();
+    private RescueGroup rescueGroup = new RescueGroup();
 
     public Coordinates coordinates;
 
@@ -40,29 +40,27 @@ public class EjectedPilotInfo implements Entity<EjectedPilotInfo> {
     }
 
     public void allocateAirplane(Airplane airplane, String controllerClientId){
-        AllocatedAirplane allocatedAirplane = new AllocatedAirplane(airplane);
-        allocatedAirplanes.add(allocatedAirplane);
-        airplane.flyTo(coordinates, controllerClientId);
-        airplane.onArrivedAtDestination(this::airplaneArrived);
+        rescueGroup.allocateAirplane(airplane, controllerClientId);
     }
 
-    private void airplaneArrived(Airplane airplane){
+    private class RescueGroup {
+        Set<Airplane> enRoute = new HashSet<>();
+        Set<Airplane> arrived = new HashSet<>();
 
-        allocatedAirplanes.stream()
-                .filter(allocatedAirplane -> allocatedAirplane.airplane.id == airplane.id)
-                .forEach(allocatedAirplane -> allocatedAirplane.arrivedAtDestination=true);
-
-        if (allocatedAirplanes.stream().allMatch(allocatedAirplane -> allocatedAirplane.arrivedAtDestination)){
-            allocatedAirplanes.forEach(allocatedAirplane -> allocatedAirplane.airplane.unAllocate());
+        public void allocateAirplane(Airplane airplane, String controlledClientId) {
+            enRoute.add(airplane);
+            airplane.flyTo(coordinates, controlledClientId);
+            airplane.onArrivedAtDestination(this::airplaneArrived);
         }
-    }
 
-    private class AllocatedAirplane{
-        Airplane airplane;
-        boolean arrivedAtDestination;
+        private void airplaneArrived(Airplane airplane) {
+            enRoute.remove(airplane);
+            arrived.add(airplane);
 
-        AllocatedAirplane(Airplane airplane) {
-            this.airplane = airplane;
+            if (enRoute.isEmpty())
+                arrived.forEach(plane -> plane.unAllocate());
+
+            arrived.clear();
         }
     }
 }
