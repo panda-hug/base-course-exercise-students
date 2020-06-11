@@ -24,7 +24,6 @@ public class EjectedPilotHandler {
     }
 
     @GetMapping("/takeResponsibility")
-    // TODO: Correct return type?
     void takeResponsibility(@CookieValue(name = "client-id") String clientId, @RequestParam int ejectionId) {
         EjectedPilotInfo ejectedInfo = dataBase.getByID(ejectionId, EjectedPilotInfo.class);
         if (ejectedInfo != null && ejectedInfo.rescuedBy == null) {
