@@ -89,7 +89,6 @@ public class SimulativeAirSituationProvider implements AirSituationProvider {
                     airplanes.remove(indexToRemove);
                 }
 
-
                 airplanes.forEach(airplane -> {
                     airplane.radialAcceleration = calculateNewRadialAcceleration(airplane);
 
@@ -124,7 +123,6 @@ public class SimulativeAirSituationProvider implements AirSituationProvider {
             double azimuthToDestination = geographicCalculations.azimuthBetween(currLocation, headingTo);
             double differenceOfAzimuth = HALF_CIRCLE_DEG - geographicCalculations.normalizeAzimuth(azimuthToDestination - airplane.getAzimuth());
 
-            //TODO:is 5, 10 are magic numbers
             return (differenceOfAzimuth > 0 ? Math.min(AZIMUTH_STEP*10, differenceOfAzimuth/5) : Math.max(-AZIMUTH_STEP*10, differenceOfAzimuth/5))/2;
 
         }
