@@ -26,6 +26,8 @@ public class EjectedPilotHandler {
         EjectedPilotInfo ejectedInfo = dataBase.getByID(ejectionId, EjectedPilotInfo.class);
         if (ejectedInfo != null && ejectedInfo.rescuedBy == null) {
             airplanesAllocationManager.allocateAirplanesForEjection(ejectedInfo, clientId);
+            ejectedInfo.rescuedBy = clientId;
+            dataBase.update(ejectedInfo);
         }
     }
 
