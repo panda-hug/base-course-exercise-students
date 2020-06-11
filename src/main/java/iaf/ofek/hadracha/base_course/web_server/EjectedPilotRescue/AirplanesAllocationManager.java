@@ -32,7 +32,7 @@ public class AirplanesAllocationManager {
         // The current algorithm - find the closest available airplane of each kind
 
         List<Airplane> airplanes = airSituationProvider.getAllAirplanes();
-        Coordinates ejectionCoordinates = ejectedPilotInfo.coordinates;
+        Coordinates ejectionCoordinates = ejectedPilotInfo.getCoordinates();
 
         Map<AirplaneKind, ClosestAirplane> closestAirplanes = new HashMap<>();
         closestAirplanes.put(AirplaneKind.Krav, new ClosestAirplane());
@@ -42,12 +42,12 @@ public class AirplanesAllocationManager {
 
         airplanes.stream()
                 .filter(airplane -> !airplane.isAllocated())
-                .forEach(airplane -> {
+                .forEach(airplane ->
                     closestAirplanes.keySet().forEach(kind -> {
                         if (airplane.getAirplaneKind().isDescendantOf(kind))
                             closestAirplanes.get(kind).updateIfCloser(airplane, ejectionCoordinates);
-                    });
-                });
+                    })
+                );
 
         closestAirplanes.values().forEach(closestAirplane -> {
             if (closestAirplane.closestAirplane!=null) {

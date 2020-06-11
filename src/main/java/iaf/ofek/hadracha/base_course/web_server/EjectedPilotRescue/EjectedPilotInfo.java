@@ -11,14 +11,11 @@ public class EjectedPilotInfo implements Entity<EjectedPilotInfo> {
     private int id;
     private RescueGroup rescueGroup = new RescueGroup();
 
-    public Coordinates coordinates;
+    private Coordinates coordinates;
 
-    public String pilotName;
+    private String pilotName;
 
-    /**
-     * The rescue manager's client id, or null if non.
-     */
-    public String rescuedBy;
+    private String rescuedBy;
 
     @Override
     public int getId() {
@@ -43,6 +40,33 @@ public class EjectedPilotInfo implements Entity<EjectedPilotInfo> {
         rescueGroup.allocateAirplane(airplane, controllerClientId);
     }
 
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public String getPilotName() {
+        return pilotName;
+    }
+
+    public void setPilotName(String pilotName) {
+        this.pilotName = pilotName;
+    }
+
+    /**
+     * The rescue manager's client id, or null if non.
+     */
+    public String getRescuedBy() {
+        return rescuedBy;
+    }
+
+    public void setRescuedBy(String rescuedBy) {
+        this.rescuedBy = rescuedBy;
+    }
+
     private class RescueGroup {
         Set<Airplane> enRoute = new HashSet<>();
         Set<Airplane> arrived = new HashSet<>();
@@ -58,7 +82,7 @@ public class EjectedPilotInfo implements Entity<EjectedPilotInfo> {
             arrived.add(airplane);
 
             if (enRoute.isEmpty())
-                arrived.forEach(plane -> plane.unAllocate());
+                arrived.forEach(Airplane::unAllocate);
 
             arrived.clear();
         }

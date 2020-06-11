@@ -24,9 +24,9 @@ public class EjectedPilotHandler {
     @GetMapping("/takeResponsibility")
     void takeResponsibility(@CookieValue(name = "client-id") String clientId, @RequestParam int ejectionId) {
         EjectedPilotInfo ejectedInfo = dataBase.getByID(ejectionId, EjectedPilotInfo.class);
-        if (ejectedInfo != null && ejectedInfo.rescuedBy == null) {
+        if (ejectedInfo != null && ejectedInfo.getRescuedBy() == null) {
             airplanesAllocationManager.allocateAirplanesForEjection(ejectedInfo, clientId);
-            ejectedInfo.rescuedBy = clientId;
+            ejectedInfo.setRescuedBy(clientId);
             dataBase.update(ejectedInfo);
         }
     }
