@@ -18,9 +18,7 @@ public class EjectedPilotHandler {
 
     @GetMapping("/infos")
     List<EjectedPilotInfo> getEjectedPilotInfos() {
-        List<EjectedPilotInfo> ejectedPilotInfos = dataBase.getAllOfType(EjectedPilotInfo.class);
-        // More logic?
-        return ejectedPilotInfos;
+        return dataBase.getAllOfType(EjectedPilotInfo.class);
     }
 
     @GetMapping("/takeResponsibility")
