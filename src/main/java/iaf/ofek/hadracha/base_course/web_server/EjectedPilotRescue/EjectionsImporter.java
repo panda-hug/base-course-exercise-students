@@ -3,22 +3,16 @@ package iaf.ofek.hadracha.base_course.web_server.EjectedPilotRescue;
 import iaf.ofek.hadracha.base_course.web_server.Data.CrudDataBase;
 import iaf.ofek.hadracha.base_course.web_server.Data.Entity;
 import iaf.ofek.hadracha.base_course.web_server.Utilities.ListOperations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -63,8 +57,8 @@ public class EjectionsImporter {
             List<EjectedPilotInfo> updatedEjections = ejectionsFromServer;
             List<EjectedPilotInfo> previousEjections = dataBase.getAllOfType(EjectedPilotInfo.class);
 
-            List<EjectedPilotInfo> addedEjections = ejectionsToAdd(updatedEjections, previousEjections);
-            List<EjectedPilotInfo> removedEjections = ejectionsToRemove(updatedEjections, previousEjections);
+            List<EjectedPilotInfo> addedEjections = updateEjectionsList(updatedEjections, previousEjections);
+            List<EjectedPilotInfo> removedEjections = updateEjectionsList(previousEjections, updatedEjections);
 
             addedEjections.forEach(dataBase::create);
             removedEjections.stream().map(EjectedPilotInfo::getId).forEach(id -> dataBase.delete(id, EjectedPilotInfo.class));
@@ -74,11 +68,8 @@ public class EjectionsImporter {
         }
     }
 
-    private List<EjectedPilotInfo> ejectionsToRemove(List<EjectedPilotInfo> updatedEjections, List<EjectedPilotInfo> previousEjections) {
-        return listOperations.subtract(previousEjections, updatedEjections, new Entity.ByIdEqualizer<>());
+    private List<EjectedPilotInfo> updateEjectionsList(List<EjectedPilotInfo> baseList, List<EjectedPilotInfo> elementsToRemove) {
+        return listOperations.subtract(baseList, elementsToRemove, new Entity.ByIdEqualizer<>());
     }
 
-    private List<EjectedPilotInfo> ejectionsToAdd(List<EjectedPilotInfo> updatedEjections, List<EjectedPilotInfo> previousEjections) {
-        return listOperations.subtract(updatedEjections, previousEjections, new Entity.ByIdEqualizer<>());
-    }
 }
